@@ -623,7 +623,7 @@
           </box>
         </geometry>
       </visual>
-      <sensor name='camera' type='camera'>
+      <sensor name='camera' type='depth'>
         <camera name='__default__'>
           <!-- FOV,120度 -->
           <horizontal_fov>2.0944</horizontal_fov>
@@ -652,10 +652,34 @@
             <cutoff_angle>3.1415</cutoff_angle>
           </lens>
         </camera>
+        <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+          <baseline>0.2</baseline>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera_ir</cameraName>
+          <imageTopicName>/uav1/prometheus/sensor/camera/color/image_raw</imageTopicName>
+          <cameraInfoTopicName>/uav1/prometheus/sensor/camera/color/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/uav1/prometheus/sensor/camera/depth/image_raw</depthImageTopicName>
+          <depthImageCameraInfoTopicName>/uav1/prometheus/sensor/camera/depth/camera_info</depthImageCameraInfoTopicName>
+          <pointCloudTopicName>/uav1/prometheus/sensor/camera/depth/points</pointCloudTopicName>
+          <frameName>Monocular_front_optical_link</frameName>
+          <pointCloudCutoff>0.5</pointCloudCutoff>
+          <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+          <distortionK1>0</distortionK1>
+          <distortionK2>0</distortionK2>
+          <distortionK3>0</distortionK3>
+          <distortionT1>0</distortionT1>
+          <distortionT2>0</distortionT2>
+          <CxPrime>640</CxPrime>
+          <Cx>640</Cx>
+          <Cy>360</Cy>
+          <focalLength>0</focalLength>
+          <hackBaseline>0</hackBaseline>
+        </plugin>
         <always_on>1</always_on>
         <update_rate>30</update_rate>
         <visualize>1</visualize>
-        <plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
+        <!--plugin name='camera_plugin' filename='libgazebo_ros_camera.so'>
             <robotNamespace>/uav1/prometheus/sensor</robotNamespace>
             <alwaysOn>true</alwaysOn>
             <imageTopicName>image_raw</imageTopicName>
@@ -673,16 +697,17 @@
             <distortionK3>0.0</distortionK3>
             <distortionT1>0.0</distortionT1>
             <distortionT2>0.0</distortionT2>
-        </plugin>
+        </plugin-->
+        
       </sensor>
       <self_collide>0</self_collide>
       <kinematic>0</kinematic>
     </link>
 
     <!-- 前视相机关节 -->
-    <joint name="Monocular_front_joint" type="fixed">
-      <child>uav1::Monocular_front_link</child>
-      <parent>uav1::base_link</parent>
+    <joint name="depth_camera_joint" type="fixed">
+      <child>prometheus/sensor/camera_depth_optical_frame</child>
+      <parent>base_link</parent>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
