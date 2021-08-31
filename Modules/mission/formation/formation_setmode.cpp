@@ -17,7 +17,7 @@ void formation::init()
     ros::param::param<int>("~OFFBOARD_intervals", offboard_intervals, 3);
     ros::param::param<int>("~LAND_intervals", land_intervals, 3);
     ros::param::param<string>("Flight_controller", flight_controller, "spm");
-    ros::param::param<double>("~Takeoff_height", takeoff_height, 1.0);
+    ros::param::param<double>("Takeoff_height", takeoff_height, 1.0);
 }
 
 void formation::is_wait(int time)

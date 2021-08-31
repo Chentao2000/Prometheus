@@ -387,13 +387,16 @@ class formation
         //是否为仿真.true代表为仿真,false代表真机
         bool sim;
 
+        //gps无人机集群控制指令发布标志
+        bool gps_control_flag;
+
         //飞行控制系统:px4 或者 apm
         std::string flight_controller;
 
         //定位数据来源
         std::string location_source;
 
-        //起飞高度(apm)
+        //起飞高度
         double takeoff_height;
 
         //程序运行初始时间
