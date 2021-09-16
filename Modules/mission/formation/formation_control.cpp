@@ -72,7 +72,10 @@ void formation::init()
     //设置程序初始时间
     begin_time = ros::Time::now();
 
+
+    //无人机位置差值纠偏功能标志置为true
     bool offset_flag = true;
+    //初始化五架无人机的位置差值数据
     for(int i=0; i<5; i++)
     {
         Eigen::Vector3d gps_offset_pose;
@@ -81,9 +84,11 @@ void formation::init()
 
     if(location_source == "gps")
     {
+        //创建获取位置偏差数据
         get_offsetpose_client = n.serviceClient<prometheus_msgs::GetOffsetpose>("/get_offset_pose");
         prometheus_msgs::GetOffsetpose srv;
 
+        //接收用户指令
         int start_flag;
         std::cout << "Input 1 to start detecting the difference in the position of the drone" << std::endl;
         std::cin >> start_flag;
@@ -92,7 +97,7 @@ void formation::init()
             ROS_ERROR("Input error, process has dead [-1]");
             ros::shutdown();
         }
-
+        //获取四架无人机的位置差值
         while(offset_flag)
         {
             for(int i=1; i<=5; i++)
@@ -104,6 +109,8 @@ void formation::init()
                     uavs_gps_offset_pose[i][1] = srv.response.offset_pose_y;
                 }
             }
+
+            //显示位置差值结果
             std::cout << "-----------------------------------------------------" << std::endl;
             std::cout << "uav2 offset pose is  x :  " << uavs_gps_offset_pose[1][0] << "   " 
             << "uav2 offset pose is  y :  " << uavs_gps_offset_pose[1][1]<< std::endl;
@@ -119,6 +126,7 @@ void formation::init()
 
             std::cout << "-----------------------------------------------------" << std::endl;
 
+            //确认位置差值是否准确,准确则进入下一阶段,不准确则重新校准
             std::cout << "Please check uavs offset pose, input 0 to continue, input 1 to recalculate " << std::endl;
             int check_flag;
             std::cin >> check_flag;
