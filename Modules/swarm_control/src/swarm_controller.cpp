@@ -108,7 +108,7 @@ void mainloop_cb(const ros::TimerEvent &e)
             Takeoff_position = pos_drone;
             pos_des[0] = pos_drone[0];
             pos_des[1] = pos_drone[1];
-            pos_des[2] = pos_drone[2] + 1.0;
+            pos_des[2] = pos_drone[2] + Takeoff_height;
             vel_des << 0.0, 0.0, 0.0;
             acc_des << 0.0, 0.0, 0.0;
             yaw_des    = yaw_drone;
@@ -127,24 +127,27 @@ void mainloop_cb(const ros::TimerEvent &e)
         }
         break;
 
-    // 【Land】 降落。当前位置原地降落，降落后会自动上锁，且切换为mannual模式
+    // 【Land】 降落。两种降落方式： 只有加载了参数Land_mode为1时，启用第二种降落方式；默认启用第一种降落方式。
+    //  第一种：当前位置原地降落，降落后会自动上锁，且切换为mannual模式
+    //  第二种：当前位置原地降落，降落中到达Disarm_height后，切换为飞控中land模式
     case prometheus_msgs::SwarmCommand::Land:
         /*if (Command_Last.Mode != prometheus_msgs::SwarmCommand::Land)
         {
-            // 设定起飞位置
-            pos_des[0] = pos_drone[0];
-            pos_des[1] = pos_drone[1];
-            pos_des[2] = 0.0;
-            vel_des << 0.0, 0.0, -Land_speed;
-            acc_des << 0.0, 0.0, 0.0;
-            yaw_des = yaw_drone;
-        }
-
-        if(_DroneState.position[2] < Disarm_height)
-        {
-            //此处切换会manual模式是因为:PX4默认在offboard模式且有控制的情况下没法上锁,直接使用飞控中的land模式
-            mode_cmd.request.custom_mode = "MANUAL";
+            mode_cmd.request.custom_mode = "AUTO.LAND";
             set_mode_client.call(mode_cmd);
+        }
+        else
+        {
+            if (Command_Last.Mode != prometheus_msgs::SwarmCommand::Land)
+            {
+                // 设定起飞位置
+                pos_des[0] = pos_drone[0];
+                pos_des[1] = pos_drone[1];
+                pos_des[2] = 0.0;
+                vel_des << 0.0, 0.0, -Land_speed;
+                acc_des << 0.0, 0.0, 0.0;
+                yaw_des = yaw_drone;
+            }
 
             arm_cmd.request.value = false;
             arming_client.call(arm_cmd);
@@ -230,8 +233,9 @@ void mainloop_cb(const ros::TimerEvent &e)
                     dv.setZero();
                 }
 
-                vel_des[0] -= 2.0*dv[0];
-                vel_des[1] -= 2.0*dv[1];
+                // 降低避障的影响，调小这个参数
+                vel_des[0] -= 0.5*dv[0];
+                vel_des[1] -= 0.5*dv[1];
             }  
         }
 
